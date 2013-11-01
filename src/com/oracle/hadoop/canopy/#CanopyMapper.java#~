@@ -1,0 +1,31 @@
+package com.oracle.hadoop.canopy;
+
+import java.io.IOException;
+import java.util.*;
+import java.nio.CharBuffer;
+import java.nio.ByteBuffer;
+
+import org.apache.hadoop.conf.*;
+
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.lib.input.*;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.GenericOptionsParser;
+
+
+/* assume we're taking in CSV data for now */
+
+public class CanopyClusterMapper
+    extends Mapper<Text, Text, Text, Text> {
+    
+    private int count = 0;
+    private ArrayList<String> centers;
+
+    public void map(Text key, Text value, final Context output) throws IOException, InterruptedException
+    {
+	
+    }
+
+}

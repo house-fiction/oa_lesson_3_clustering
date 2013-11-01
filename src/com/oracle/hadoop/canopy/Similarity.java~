@@ -1,0 +1,75 @@
+package com.oracle.hadoop.canopy;
+
+
+import org.apache.commons.math.linear.*;
+import java.lang.*;
+import java.util.*;
+
+public static class Similarity
+{
+
+    public static double [] toDoubleArray(String [] s)
+    {
+	double [] d = new double[s.length];
+	for (int i  = 0; i < s.length; i++)
+	    {
+		try
+		    {
+			double d_i = Double.parseDouble(s);
+			d[i] = d_i;
+		    
+		}
+		catch (NumberFormatException NFE)
+		    {
+			d[i] = Double.NaN;
+		    }
+	    }
+	return d;
+    }
+
+    public static double jacardSimilarity(ArrayList<String> s1, ArrayList<String> s2)
+    {
+	HashSet<String> unionXY = new HashSet<String>(s1);
+	unionXY.addAll(s2);
+	HashSet<String> intersectionXY = new HashSet<String>(s1);
+	intersectionXY.retainAll(s2);
+
+	double similarity = intersectionXY.size()/((double)unionXY.size());
+	return similarity;
+    }
+
+    public static double cosineDistance(double [] x, double [] y)
+    {
+	ArrayRealVector x_v = new ArrayRealVector(x);
+	ArrayRealVector y_v = new ArrayRealVector(y);
+	double denominator  = Math.sqrt(x_v.getNorm()*y_v.getNorm());
+	return x_v.dotProduct(y_v)/denominator;
+    }
+
+    public static double twoNorm(double [] x, double [] y)
+    {
+	ArrayRealVector x_v = new ArrayRealVector(x);
+	ArrayRealVector y_v = new ArrayRealVector(y);
+	return x_v.getDistance(y_v);
+
+    }
+
+    public static double oneNorm(double [] x, double [] y)
+    {
+	ArrayRealVector x_v = new ArrayRealVector(x);
+	ArrayRealVector y_v = new ArrayRealVector(y);
+	return x_v.getL1Distance(y_v);
+
+    }
+
+    public static double infNorm(double [] x, double [] y)
+    {
+	ArrayRealVector x_v = new ArrayRealVector(x);
+	ArrayRealVector y_v = new ArrayRealVector(y);
+	return x_v.getLInfDistance(y_v);
+	
+    }
+
+
+
+}

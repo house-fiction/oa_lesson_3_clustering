@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<LOADER_MAP>
+  <SCHEMA>MARKETBASKET</SCHEMA>
+  <TABLE>CUSTOMER_CLUSTERING</TABLE>
+  <COLUMN field="F0">CUSTOMER_ID</COLUMN>
+  <COLUMN field="F1">X</COLUMN>
+  <COLUMN field="F2">Y</COLUMN>
+  <COLUMN field="F3">Z</COLUMN>
+</LOADER_MAP>
+  

@@ -1,0 +1,55 @@
+#Add the dataset
+hadoop fs -rm -r /user/oracle/canopy_cluster
+hadoop fs -put cluster_sample.xml /user/oracle/canopy_cluster
+
+#in Hive
+add jar /usr/lib/hive/lib/hive-contrib-0.9.0-cdh4.1.2.jar; 
+
+#Create a function
+
+CREATE temporary function row_sequence AS 'org.apache.hadoop.hive.contrib.udf.UDFRowSequence'; 
+
+
+CREATE EXTERNAL TABLE customers_to_cluster (record string)
+ROW FORMAT DELIMITED
+LINES TERMINATED BY '\n'STORED AS TEXTFILE
+LOCATION '/user/oracle/canopy_cluster';
+
+
+
+CREATE TABLE customer_vector (customer_id int, customer_name string, email string, x float, y float, z float)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED  BY ','
+STORED AS TEXTFILE;
+
+
+
+INSERT OVERWRITE TABLE customer_vector 
+SELECT row_sequence() as customer_id, xpath_string(record, "/record/Customer") as customer_name,
+xpath_string(record, "/record/Email") as email, 
+xpath_float(record, "/record/X") as x, 
+xpath_float(record,"/record/Y") as y, xpath_float(record, "/record/Z") as zFROM customers_to_cluster;
+
+
+
+
+INSERT OVERWRITE DIRECTORY '/user/oracle/cluster_vector' 
+SELECT x, y, z FROM customer_vector;
+
+INSERT OVERWRITE DIRECTORY '/user/oracle/cluster_customers' 
+SELECT customer_id, x, y, z FROM customer_vector;
+
+
+
+#Run the canopy clusterer
+hadoop fs -rm -r /user/oracle/canopy_output
+
+hadoop jar dist/lib/canopy_cluster-20130314.jar com.oracle.hadoop.canopy.FindCanopies -DT2=1.5 -Ddistance=L2 -Dsep="\u0001" /user/oracle/cluster_vector /user/oracle/canopy_output
+
+hadoop jar dist/lib/canopy_cluster-20130314.jar com.oracle.hadoop.canopy.AssignCanopies -DT2=1.5 -Ddistance=L2 -Dsep="\u0001" /user/oracle/cluster_customers /user/oracle/canopy_assignment
+
+
+#extract a dataset for k-means clustering (this fits in memory, so we don't *need* to canopy cluster)
+hive -S -e 'SELECT customer_id, x, y, z from customer_vector' > cluster_set.dat
+
+
